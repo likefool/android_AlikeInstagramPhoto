@@ -1,17 +1,89 @@
 package com.yahoo.android_alikuigphoto;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+
+import com.loopj.android.http.*;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
+
+    public static final String CLIENT_ID = "6a442dfcc68040d5a7d8bae1d3f164a5";
+    private ArrayList<IGPhoto> photos;
+    private IGPhotoAdapter photoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Send out api requests to popular photos
+        photos = new ArrayList<>();
+        // 1. Create the adapter linking it to the source
+        photoAdapter = new IGPhotoAdapter(this, photos);
+        // 2. Find the listview from the layout
+        ListView lvPhotos = (ListView) findViewById(R.id.lvPhotosList);
+        // 3. Set the adapter binding it to the ListView
+        lvPhotos.setAdapter(photoAdapter);
+        // Fetch the popular photos
+        fetchIGPopularPhotos();
+    }
+
+    private void fetchIGPopularPhotos() {
+        /*
+        - popular: https://api.instagram.com/v1/media/popular?access_token=ACCESS-TOKEN
+        - Response
+            - Type: { “data” => [x] => “type” } (“image” OR “video")
+            - URL: { “data” => [x] => “images” => “standard_resolution” => “url" }
+            - Caption: { “data” => [x] => “caption” => “text" }
+            - Author Name: { “data” => [x] => “user” => “username" }
+         */
+
+        String url = "https://api.instagram.com/v1/media/popular?client_id=" + CLIENT_ID;
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url,null, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                JSONArray photosJSON = null;
+                try {
+                    photosJSON = response.getJSONArray("data");
+
+                    for (int i=0; i< photosJSON.length(); i++){
+                        JSONObject photoJSON = photosJSON.getJSONObject(i);
+                        IGPhoto photo = new IGPhoto();
+                        photo.username = photoJSON.getJSONObject("user").getString("username");
+                        photo.caption = photoJSON.getJSONObject("caption").getString("text");
+                        photo.imageURL = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
+                        photo.imageHight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
+                        photo.likesCount = photoJSON.getJSONObject("likes").getInt("count");
+                        photos.add(photo);
+                    }
+
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+                // callback
+                photoAdapter.notifyDataSetChanged();
+            }
+
+
+            // on failure
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
+            }
+        });
     }
 
     @Override
