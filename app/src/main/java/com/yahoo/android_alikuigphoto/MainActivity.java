@@ -2,6 +2,7 @@ package com.yahoo.android_alikuigphoto;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,11 +24,31 @@ public class MainActivity extends Activity {
     public static final String CLIENT_ID = "6a442dfcc68040d5a7d8bae1d3f164a5";
     private ArrayList<IGPhoto> photos;
     private IGPhotoAdapter photoAdapter;
+    private SwipeRefreshLayout swipeContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                fetchIGPopularPhotos();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         // Send out api requests to popular photos
         photos = new ArrayList<>();
         // 1. Create the adapter linking it to the source
@@ -65,6 +86,7 @@ public class MainActivity extends Activity {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray photosJSON = null;
                 try {
+                    photos.clear();
                     photosJSON = response.getJSONArray("data");
 
                     for (int i=0; i< photosJSON.length(); i++){
@@ -83,17 +105,11 @@ public class MainActivity extends Activity {
                 } catch (JSONException e){
                     e.printStackTrace();
                 }
+                swipeContainer.setRefreshing(false);
                 // callback
                 photoAdapter.notifyDataSetChanged();
             }
 
-
-            // on failure
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-
-            }
         });
     }
 

@@ -48,7 +48,7 @@ public class IGPhotoAdapter extends ArrayAdapter<IGPhoto> {
         tvTime.setText(DateUtils.getRelativeTimeSpanString(photo.createTime * 1000, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS));
         // clear out the imageview
         ivPhoto.setImageResource(0);
-        ivIcon.setImageResource(1);
+        ivIcon.setImageResource(0);
         // Insert the image using picasso
         Picasso.with(getContext()).load(photo.imageURL).into(ivPhoto);
         Picasso.with(getContext()).load(photo.userIconURL).into(ivIcon);
