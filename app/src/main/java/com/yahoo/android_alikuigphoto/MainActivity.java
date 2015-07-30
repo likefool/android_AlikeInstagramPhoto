@@ -2,11 +2,12 @@ package com.yahoo.android_alikuigphoto;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.loopj.android.http.*;
+import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -52,6 +53,14 @@ public class MainActivity extends Activity {
         String url = "https://api.instagram.com/v1/media/popular?client_id=" + CLIENT_ID;
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url,null, new JsonHttpResponseHandler(){
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response)
+            {
+                Log.i("IG_VIEWER", "status code=" + statusCode + ", response=" + response + ", error=" + throwable.getMessage());
+                throwable.printStackTrace();
+            }
+
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 JSONArray photosJSON = null;
@@ -62,10 +71,12 @@ public class MainActivity extends Activity {
                         JSONObject photoJSON = photosJSON.getJSONObject(i);
                         IGPhoto photo = new IGPhoto();
                         photo.username = photoJSON.getJSONObject("user").getString("username");
+                        photo.userIconURL = photoJSON.getJSONObject("user").getString("profile_picture");
                         photo.caption = photoJSON.getJSONObject("caption").getString("text");
                         photo.imageURL = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getString("url");
-                        photo.imageHight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
+                        photo.imageHeight = photoJSON.getJSONObject("images").getJSONObject("standard_resolution").getInt("height");
                         photo.likesCount = photoJSON.getJSONObject("likes").getInt("count");
+                        photo.createTime = photoJSON.getLong("created_time");
                         photos.add(photo);
                     }
 

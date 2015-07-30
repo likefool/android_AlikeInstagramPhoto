@@ -7,6 +7,8 @@ public class IGPhoto {
     public String username;
     public String caption;
     public String imageURL;
-    public int imageHight;
+    public String userIconURL;
+    public int imageHeight;
     public int likesCount;
+    public long createTime;
 }

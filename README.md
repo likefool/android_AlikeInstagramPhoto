@@ -9,9 +9,9 @@ Time spent: **X** hours spent in total
 The following **required** functionality is completed:
 
 * [X] User can **scroll through current popular photos** from Instagram
-* [ ] For each photo displayed, user can see the following details:
-  * [ ] Graphic, Caption, Username
-  * [ ] Relative timestamp, like count, user profile image
+* [X] For each photo displayed, user can see the following details:
+  * [X] Graphic, Caption, Username
+  * [X] Relative timestamp, like count, user profile image
 
 The following **optional** features are implemented:
 
@@ -36,7 +36,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='android_week1.gif' title='Video Walkthrough' width='300' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
