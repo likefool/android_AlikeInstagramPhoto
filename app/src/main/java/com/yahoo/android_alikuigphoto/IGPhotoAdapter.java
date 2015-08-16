@@ -1,6 +1,7 @@
 package com.yahoo.android_alikuigphoto;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import java.util.List;
 
@@ -51,7 +54,18 @@ public class IGPhotoAdapter extends ArrayAdapter<IGPhoto> {
         ivIcon.setImageResource(0);
         // Insert the image using picasso
         Picasso.with(getContext()).load(photo.imageURL).into(ivPhoto);
-        Picasso.with(getContext()).load(photo.userIconURL).into(ivIcon);
+
+        Transformation transformation = new RoundedTransformationBuilder()
+                .borderColor(Color.WHITE)
+                .borderWidthDp(1)
+                .cornerRadiusDp(30)
+                .oval(false)
+                .build();
+        Picasso.with(getContext())
+                .load(photo.userIconURL)
+                .fit()
+                .transform(transformation)
+                .into(ivIcon);
         // Return the created item as a view
         return convertView;
     }
